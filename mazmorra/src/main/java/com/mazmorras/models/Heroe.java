@@ -72,8 +72,8 @@ public class Heroe extends Personaje {
             if (obs != null && obs.getTipoObstaculo() == com.mazmorras.enums.TipoObstaculo.TRAMPILLA) {
                 setX(nuevaX);
                 setY(nuevaY);
-                // Quita vida al héroe al pisar la trampilla
-                int danoTrampilla = 20; // Puedes ajustar el daño aquí
+                // Quita vida al héroe al pisar la trampilla.
+                int danoTrampilla = 20; // Puedes ajustar el daño aquí.
                 setVidaActual(Math.max(0, getVidaActual() - danoTrampilla));
                 notifyPersonajeActualizado();
                 // Si quieres que muera si la vida llega a 0, puedes comprobarlo aquí:

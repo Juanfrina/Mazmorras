@@ -120,7 +120,7 @@ public class Utils {
                             }
                         }
                         break;
-                    case 'T':
+                    case 'T': // Trampilla
                         mapa.colocarObstaculos(i, alto - 1, TipoObstaculo.TRAMPILLA);
                         break;
                     default:
