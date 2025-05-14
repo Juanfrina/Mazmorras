@@ -7,5 +7,5 @@ package com.mazmorras.enums;
  * @author Inma
  */
 public enum TipoObstaculo {
-    BARRIL, PARED, CHARCO
+    BARRIL, PARED, CHARCO, TRAMPILLA
 }

@@ -19,7 +19,7 @@ public abstract class Personaje {
     protected int x; // Posición X en el mapa
     protected int y; // Posición Y en el mapa
     private int vidaMaxima; // Vida máxima del personaje
-    private int vidaActual; // Vida actual del personaje
+    protected int vidaActual; // Vida actual del personaje
     private int ataque; // Valor de ataque del personaje
     private int defensa; // Valor de defensa del personaje
     private int velocidad; // Velocidad del personaje

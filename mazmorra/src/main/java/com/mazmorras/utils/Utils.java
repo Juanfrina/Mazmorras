@@ -120,6 +120,9 @@ public class Utils {
                             }
                         }
                         break;
+                    case 'T':
+                        mapa.colocarObstaculos(i, alto - 1, TipoObstaculo.TRAMPILLA);
+                        break;
                     default:
                         System.out.println("Contenido desconocido en (" + i + ", " + (alto - 1) + "): " + caracteres[i]);
                         break;

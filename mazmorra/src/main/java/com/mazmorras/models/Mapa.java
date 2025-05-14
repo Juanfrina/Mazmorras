@@ -312,4 +312,11 @@ public class Mapa {
         //Si no coincide con nada, devuelve un carácter vacío
         return ' ';
     }
+
+    public Obstaculo getObstaculoEn(int x, int y) {
+        for (Obstaculo o : obstaculos) {
+            if (o.getX() == x && o.getY() == y) return o;
+        }
+        return null;
+    }
 }

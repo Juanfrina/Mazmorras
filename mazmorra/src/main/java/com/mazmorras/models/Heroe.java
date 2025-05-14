@@ -51,41 +51,41 @@ public class Heroe extends Personaje {
             throw new IllegalArgumentException("El mapa y la dirección no pueden ser nulos.");
         }
 
-        // Calcular nueva posición basada en la dirección
         int nuevaX = getX();
         int nuevaY = getY();
 
         switch (direccion) {
-            case ARRIBA:
-                nuevaY--;
-                break;
-            case ABAJO:
-                nuevaY++;
-                break;
-            case IZQUIERDA:
-                nuevaX--;
-                break;
-            case DERECHA:
-                nuevaX++;
-                break;
-            default:
-                throw new IllegalArgumentException("Dirección no válida.");
+            case ARRIBA:    nuevaY--; break;
+            case ABAJO:     nuevaY++; break;
+            case IZQUIERDA: nuevaX--; break;
+            case DERECHA:   nuevaX++; break;
+            default: throw new IllegalArgumentException("Dirección no válida.");
         }
 
-        // Validar que la nueva posición esté dentro de los límites del mapa
         if (nuevaX < 0 || nuevaX >= mapa.getAncho() || nuevaY < 0 || nuevaY >= mapa.getAlto()) {
             throw new IllegalStateException("El héroe no puede moverse fuera de los límites del mapa.");
         }
 
-        // Validar que la nueva posición no esté ocupada por un obstáculo
+        // Permitir pisar trampilla, pero no otros obstáculos
         if (mapa.esObstaculo(nuevaX, nuevaY)) {
-            throw new IllegalStateException("El héroe no puede moverse a una posición ocupada por un obstáculo.");
+            Obstaculo obs = mapa.getObstaculoEn(nuevaX, nuevaY);
+            if (obs != null && obs.getTipoObstaculo() == com.mazmorras.enums.TipoObstaculo.TRAMPILLA) {
+                setX(nuevaX);
+                setY(nuevaY);
+                // Quita vida al héroe al pisar la trampilla
+                int danoTrampilla = 20; // Puedes ajustar el daño aquí
+                setVidaActual(Math.max(0, getVidaActual() - danoTrampilla));
+                notifyPersonajeActualizado();
+                // Si quieres que muera si la vida llega a 0, puedes comprobarlo aquí:
+                // if (getVidaActual() <= 0) throw new RuntimeException("TRAMPILLA");
+                return;
+            } else {
+                throw new IllegalStateException("El héroe no puede moverse a una posición ocupada por un obstáculo.");
+            }
         }
 
-        // Actualizar la posición del héroe
         setX(nuevaX);
         setY(nuevaY);
-        // Notificar a los observadores del movimiento
         notifyPersonajeActualizado();
     }
 
@@ -105,4 +105,12 @@ public class Heroe extends Personaje {
                 " SPD: " + getVelocidad();
     }
 
+    /**
+     * Establece la vida actual del personaje.
+     *
+     * @param vidaActual Nueva cantidad de vida actual.
+     */
+    public void setVidaActual(int vidaActual) {
+        this.vidaActual = vidaActual;
+    }
 }

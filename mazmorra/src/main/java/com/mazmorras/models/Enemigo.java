@@ -74,7 +74,6 @@ public class Enemigo extends Personaje {
         if (estaEnRango(objetivo, this.percepcion)) {
             int[] nuevaPos = mapa.encontrarCamino(x, y, objetivo.getX(), objetivo.getY());
             if (nuevaPos != null
-
                     && nuevaPos[0] >= 0 && nuevaPos[0] < mapa.getAncho()
                     && nuevaPos[1] >= 0 && nuevaPos[1] < mapa.getAlto()
                     && mapa.isValidMove(nuevaPos[0], nuevaPos[1])) {

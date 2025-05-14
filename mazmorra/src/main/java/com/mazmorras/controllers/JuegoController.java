@@ -201,13 +201,20 @@ public class JuegoController implements JuegoObserver {
                 Salida salida = mapa.getSalida();
                 if (salida != null && heroe.getX() == salida.getX() && heroe.getY() == salida.getY()) {
                     onGameOver(true);
-                    return; //Termina aquí para que no sigan los turnos
+                    return;
                 }
 
-                moverEnemigos(); //Mueve a los enemigos después de que el héroe se mueve
-                generarMapaDesdeFXML(mapa); // Actualiza el mapa visualmente
-                turno++; //Incrementa el turno
-                turnoLabel.setText("Turno: " + turno); // Actualiza el label
+                moverEnemigos();
+                generarMapaDesdeFXML(mapa);
+                turno++;
+                turnoLabel.setText("Turno: " + turno);
+            } catch (RuntimeException e) {
+                if ("TRAMPILLA".equals(e.getMessage())) {
+                    onGameOver(false); // El héroe muere por la trampilla
+                    return;
+                } else {
+                    System.out.println("Movimiento inválido: " + e.getMessage());
+                }
             } catch (Exception e) {
                 System.out.println("Movimiento inválido: " + e.getMessage());
             }
@@ -472,6 +479,7 @@ public class JuegoController implements JuegoObserver {
         imageCache.put("goblin", new Image(getClass().getResourceAsStream("/imagenes/goblin.png")));
         imageCache.put("esqueleto", new Image(getClass().getResourceAsStream("/imagenes/esqueleto.png")));
         imageCache.put("heroe", new Image(getClass().getResourceAsStream("/imagenes/heroe.png")));
+        imageCache.put("trampilla", new Image(getClass().getResourceAsStream("/imagenes/trampilla.png")));
     }
 
     /**
@@ -512,24 +520,18 @@ public class JuegoController implements JuegoObserver {
 
         mapaGrid.getChildren().clear();
 
-        //Inicializa el cache de imágenes si no existe
+        // Inicializa el cache de imágenes si no existe
         if (imageCache == null) {
             inicializarImagenes();
         }
 
-        //Genera caminos
+        // 1. Genera caminos
         for (Camino camino : mapa.getCaminos()) {
             ImageView celda = crearCelda(imageCache.get("suelo"));
             mapaGrid.add(celda, camino.getX(), camino.getY());
         }
 
-        //Genera Enemigos
-        for (Enemigo enemigo : mapa.getEnemigos()) {
-            ImageView celdaEnemigo = crearCelda(imageCache.get(enemigo.getNombre().toLowerCase()));
-            mapaGrid.add(celdaEnemigo, enemigo.getX(), enemigo.getY());
-        }
-
-        //Genera obstáculos
+        // 2. Genera obstáculos (incluida la trampilla)
         for (Obstaculo obstaculo : mapa.getObstaculos()) {
             String tipoImagen = null;
             switch (obstaculo.getTipoObstaculo()) {
@@ -542,6 +544,9 @@ public class JuegoController implements JuegoObserver {
                 case CHARCO:
                     tipoImagen = "charco";
                     break;
+                case TRAMPILLA:
+                    tipoImagen = "trampilla";
+                    break;
                 default:
                     System.out.println("No existe ese tipo de obstáculo");
                     continue;
@@ -550,7 +555,13 @@ public class JuegoController implements JuegoObserver {
             mapaGrid.add(celda, obstaculo.getX(), obstaculo.getY());
         }
 
-        //Entrada, héroe y salida
+        // 3. Genera enemigos
+        for (Enemigo enemigo : mapa.getEnemigos()) {
+            ImageView celdaEnemigo = crearCelda(imageCache.get(enemigo.getNombre().toLowerCase()));
+            mapaGrid.add(celdaEnemigo, enemigo.getX(), enemigo.getY());
+        }
+
+        // 4. Entrada, héroe y salida (el héroe debe ir después de la trampilla)
         Entrada entrada = mapa.getEntrada();
         Salida salida = mapa.getSalida();
         Heroe heroe = mapa.getHeroe();
@@ -559,19 +570,24 @@ public class JuegoController implements JuegoObserver {
             ImageView celdaEntrada = crearCelda(imageCache.get("puerta"));
             mapaGrid.add(celdaEntrada, entrada.getX(), entrada.getY());
         }
-        if (heroe != null) {
-            ImageView celdaHeroe = crearCelda(imageCache.get("heroe"));
-            mapaGrid.add(celdaHeroe, heroe.getX(), heroe.getY());
-        }
         if (salida != null) {
             ImageView celdaSalida = crearCelda(imageCache.get("puertaAbierta"));
             mapaGrid.add(celdaSalida, salida.getX(), salida.getY());
+        }
+        if (heroe != null) {
+            ImageView celdaHeroe = crearCelda(imageCache.get("heroe"));
+            mapaGrid.add(celdaHeroe, heroe.getX(), heroe.getY());
         }
 
         vidaLabel.setText("Vida: " + heroe.getVidaActual());
         ataqueLabel.setText("Ataque: " + heroe.getAtaque());
         defensaLabel.setText("Defensa: " + heroe.getDefensa());
         velocidadLabel.setText("Velocidad: " + heroe.getVelocidad());
+
+        // Si la vida del héroe es 0, mostrar Game Over
+        if (heroe.getVidaActual() <= 0 && !gameOverPane.isVisible()) {
+            onGameOver(false);
+        }
     }
 
     /**
